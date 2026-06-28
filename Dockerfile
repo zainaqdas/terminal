@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     unzip zip tini ttyd \
     && rm -rf /var/lib/apt/lists/*
 
-# Node.js (via NodeSource — LTS)
+# Node.js (LTS via NodeSource)
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs
 
@@ -22,15 +22,7 @@ RUN pip3 install --upgrade pip \
     && pip3 install requests flask fastapi uvicorn django \
                    numpy pandas jupyter
 
-# Create a non-root user
-RUN useradd -m -s /bin/bash devuser
-USER devuser
-WORKDIR /home/devuser
-
-# Persistent data volume
-VOLUME ["/data"]
+WORKDIR /root
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["ttyd", "--port", "8080", \
-     "--credential", "${USERNAME}:${PASSWORD}", \
-     "bash"]
+CMD ttyd --port 8080 --credential ${USERNAME}:${PASSWORD} bash
